@@ -28,16 +28,20 @@ authRouter.post('/signup', async (req, res, next) => {
 
 authRouter.post('/signin', basicAuth, (req, res, next) => {
   const output = {
-    user: req.user,
+    user: req.user={
+      id:req.user.id,
+      username:req.user.username
+    },
     token: req.token
+
   };
   res.status(200).json(output);
 });
 
 authRouter.get('/users', bearerAuth, async (req, res, next) => {
-  const users = await User.find({});
-  const list = users.map(user => user.username);
-  res.status(200).json(list);
+  // const users = await User.find({});
+  // const list = users.map(user => user.username);
+  res.status(200).json(req.user);
 });
 
 authRouter.get('/secret', bearerAuth, async (req, res, next) => {
