@@ -15,40 +15,34 @@ users.virtual('token').get(function () {
   let tokenObject = {
     username: this.username,
   }
-  return jwt.sign(tokenObject,SECRET)
+  return jwt.sign(tokenObject,SECRET,{expiresIn:60*15})
 });
 
-users.pre('save', async function () {
+users.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
+    next();
   }
 });
 
 // BASIC AUTH
 users.statics.authenticateBasic = async function (username, password) {
-  const user = await this.findOne({ username })
-  const valid = await bcrypt.compare(password, user.password)
-  if (valid) { return user; }
+  const user = await this.findOne({ username }) //find recored for this username
+  const valid = await bcrypt.compare(password, user.password) //compare pass with hashing pass from db 
+  if (valid) { return user; } 
   throw new Error('Invalid User');
 }
 
 // BEARER AUTH
 users.statics.authenticateWithToken = async function (token) {
   try {
-    
-    const parsedToken = jwt.verify(token, SECRET);
-    console.log('parsedToken',parsedToken);
-    return  await this.findOne({ username: parsedToken.username })
-  
-    //   if (user) { 
-  //     user.token = jwt.sign(parsedToken,SECRET,{timeSensitive:'15ms'})
-  //     return user;
-  //   }
-  //   throw new Error("User Not Found");
+    const parsedToken = jwt.verify(token,SECRET); //return plyload have uniq data
+    const user= await this.findOne({ username: parsedToken.username }) //find recored for this uniq data
+    if (user) { return user; }
+    throw new Error("User Not Found");
   } catch (e) {
     throw new Error(e.message)
   }
 }
-
 
 module.exports = mongoose.model('users', users);
