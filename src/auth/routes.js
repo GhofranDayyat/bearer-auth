@@ -27,21 +27,20 @@ authRouter.post('/signup', async (req, res, next) => {
 });
 
 authRouter.post('/signin', basicAuth, (req, res, next) => {
-  const output = {
-    user: req.user={
-      id:req.user.id,
-      username:req.user.username
-    },
-    token: req.token
-
+  const user = {
+    user: req.user,
+    token: req.user.token //store token you have now in req obj and you can send it anywheare 
   };
-  res.status(200).json(output);
-});
+  res.cookie('cookie-token', user.token);
+  res.set('cookie-token', user.token);
+  res.status(200).json(user);
 
-authRouter.get('/users', bearerAuth, async (req, res, next) => {
-  // const users = await User.find({});
-  // const list = users.map(user => user.username);
-  res.status(200).json(req.user);
+});
+;
+authRouter.get('/users', bearerAuth, async (req, res, next) => { //this rout is protected , you can't access unless you have token 
+  const users = await User.find({}); //find all users in DB 
+  const list = users.map(user => user.username);
+  res.status(200).json(list);
 });
 
 authRouter.get('/secret', bearerAuth, async (req, res, next) => {
