@@ -27,7 +27,7 @@ describe('Auth Router', () => {
 
         expect(response.status).toBe(201);
         expect(userObject.token).toBeDefined();
-        expect(userObject.user._id).toBeDefined();
+        expect(userObject.user._id).toBeUndefined();
         expect(userObject.user.username).toEqual(users[userType].username)
 
       });
