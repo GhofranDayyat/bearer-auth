@@ -20,7 +20,7 @@ authRouter.post('/signup', async (req, res, next) => {
       token:userRecord.token
     };
     console.log('output===>');
-    res.status(200).json(output);
+    res.status(201).json(output);
   } catch (e) {
     next(e.message)
   }
